@@ -1,0 +1,112 @@
+meshcore:
+  connection:
+    # serial | tcp | ble
+    type: serial
+    # Typisch am Raspberry Pi mit Heltec V4 Companion Firmware:
+    port: /dev/ttyACM0
+    baudrate: 115200
+    auto_detect: true
+    debug: false
+    auto_reconnect: true
+    max_reconnect_attempts: 0
+    # Nur fuer BLE relevant
+    address: null
+    pin: null
+    # Nur fuer TCP relevant
+    host: null
+
+  device:
+    # Anzeigename des MeshCore-Devices
+    name: Pi Mesh Bot
+    # Sendeleistung in dBm, passend zur Region/Firmware waehlen
+    tx_power: 20
+    coords:
+      # Optional. Wird nur benoetigt, wenn das Device Standortdaten setzen soll.
+      lat: null
+      lon: null
+    set_time_on_connect: true
+
+  radio:
+    # Optional. Kann leer bleiben, wenn der Node bereits korrekt konfiguriert ist.
+    freq: null
+    bw: null
+    sf: null
+    cr: null
+
+  channel_sync:
+    # device = Channels vom Node lesen
+    # config = Channels nur aus der YAML verwenden
+    source: device
+    # Wenn true, werden vom Geraet gelesene Channels in config.yaml gespeichert
+    write_back_config: true
+    max_channels: 8
+
+  channels:
+    - channel_idx: 0
+      name: main
+      # 16 Bytes = 32 Hex-Zeichen. Beispielwert, unbedingt ersetzen.
+      secret_hex: "00112233445566778899aabbccddeeff"
+
+bot:
+  name: MeshcoreBot
+  enabled: true
+  command_prefix: "!"
+  allowed_channels: [0]
+  ignore_own_messages: true
+  poll_seconds: 5
+  dedupe_window_seconds: 180
+  help_text: "ℹ️ Befehle: !help, !ping, !wetter, !status, !info"
+
+  custom_commands:
+    hallo: "Hallo aus dem MeshCore Bot"
+
+  profiles:
+    - id: profile-1
+      name: Standard
+      enabled: true
+      allowed_channels: [0]
+      custom_commands: {}
+
+  # Kompatibilitaet zur alten Einzel-Bridge-Konfiguration
+  telegram_bridge:
+    enabled: false
+    bot_token: ""
+    chat_id: ""
+    mesh_channel_idx: 0
+    mesh_to_telegram: true
+    telegram_to_mesh: true
+    poll_seconds: 4
+
+  # Empfohlene Konfiguration: mehrere Bridges
+  telegram_bridges: []
+  # Beispiel:
+  # telegram_bridges:
+  #   - id: bridge-1
+  #     name: Main Bridge
+  #     enabled: true
+  #     bot_token: "123456789:REPLACE_WITH_YOUR_TOKEN"
+  #     chat_id: "-1001234567890"
+  #     mesh_channel_idx: 0
+  #     mesh_to_telegram: true
+  #     telegram_to_mesh: true
+  #     poll_seconds: 4
+
+  weather:
+    enabled: false
+    latitude: null
+    longitude: null
+    label: "My location"
+    units: metric
+
+  maintenance:
+    enabled: true
+    cleanup_interval_minutes: 30
+    message_retention_days: 14
+    max_message_rows: 5000
+    max_log_entries: 500
+    vacuum_after_cleanup: true
+
+web:
+  host: 0.0.0.0
+  port: 8080
+  cors: ["*"]
